@@ -1,0 +1,42 @@
+---
+title: "Trains"
+author: "David Kane"
+date: "3/10/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(gov.1005.data)
+library(infer)
+library(tidyverse)
+```
+
+```{r, ci_income}
+# What is the 95th confidence interval for the mean income of the Treated? Using
+# the bootstrap to calculate. If we did not sure pull(), we would have needed to
+# use summarize() again, and, when we did, we might have needed ungroup().
+
+train %>% 
+  filter(treatment == "Treated") %>% 
+  rep_sample_n(size = 51, replace = TRUE, reps = 1000) %>% 
+  group_by(replicate) %>% 
+  summarise(avg_inc = mean(income)) %>% 
+  pull(avg_inc) %>%
+  quantile(c(0.025, 0.975))
+
+```
+
+```{r, ci_differnce}
+# Mean income of the treated and the control, and then the difference between
+# the two. Main trick is the use of pivot_wider() to get these things on the
+# same row. That subtraction is easier.
+
+train %>% 
+  group_by(treatment) %>% 
+  summarise(avg_inc = mean(income)) %>% 
+  pivot_wider(names_from = treatment, values_from = avg_inc) %>% 
+  mutate(inc_diff = Treated - Control)
+  
+```
+
