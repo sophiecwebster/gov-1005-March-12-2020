@@ -15,7 +15,7 @@ library(tidyverse)
 # Work from Tuesday
 
 ```{r, ci_income}
-# What is the 95th confidence interval for the mean income of the Treated? Using
+# What is the 95% confidence interval for the mean income of the Treated? Using
 # the bootstrap to calculate. If we did not use pull(), we would have needed to
 # use summarize() again, and, when we did, we might have needed ungroup().
 # Forgetting ungroup() is one of the biggest causes of bugs in this sort of
@@ -29,6 +29,13 @@ train %>%
   pull(avg_inc) %>%
   quantile(c(0.025, 0.975))
 
+# Note the pattern above, and as discussed in class. First, we calculate
+# something, like mean income, just using standard R. Then, some where in the
+# middle of that pipe, we need to do the bootsrap, which almost always requires
+# rep_sample_n() followed by group_by(replicate). The exact order and structure
+# can vary. But this basic approach --- calculate something basic, then do
+# bootstrap/group_by in the "middle" of that calculation --- is one we will use
+# again and again.
 ```
 
 ```{r, ci_differnce}
@@ -41,26 +48,46 @@ train %>%
   summarise(avg_inc = mean(income)) %>% 
   pivot_wider(names_from = treatment, values_from = avg_inc) %>% 
   mutate(Difference = Treated - Control) %>% 
-  select(Difference, everything())
   
+  # R has many tricks and, as we go forward, we will show some of them to you.
+  # We may not get around to explaining them all in class, but you should feel
+  # free to look up the help page and to ask at Study Hall. everything(), as a
+  # way of grabbing all the columns in a select() statement is an example of
+  # such a trick. I wanted Difference to be the first column when the results
+  # get printed out, followed by all the other columns in the tibble.
+  # everything() returns all columns in the tibble, except those already
+  # specified.
+  
+  select(Difference, everything())
 ```
 
 # Tasks for Today
 
-Now that we know the difference between treated and control in this sample, we want to get a confidence interval for that difference. If we had sampled commuters other than the ones that we did sample, the difference would be different. How different might it be? Are these results consistent with the claim, made in the article, that treatment was randomly assigned?
-
-The focus of the article is on the change in attitude. In our data, this is the variable att_chg. (Note that we have scaled this somewhat differently than the article did.) Recall that a positive attitude change means that a person has become more conservative in their opinions about immigration.
-
-What is the difference in att_chg between the Treated and Control?
-
-What is a 99% confidence intervals for that difference?
-
-How do you describe that confidence interval?
-
-Are these results consistent or inconsistent with Enos (2014)?
+1) Now that we know the difference in mean income between treated and control in this sample, we want to get a confidence interval for that difference. If we had sampled commuters other than the ones that we did sample, the difference would be different. How different might it be? Are these results consistent with the claim, made in the article, that treatment was randomly assigned?
 
 
-If all of the above is easy, try to replicate Figure 2 from the article, but using the overall measure of att_chg in place of the question-specific results shown there.
+
+
+2) The focus of the article is on the change in attitude. In our data, this is the variable att_chg. (Note that we have scaled this somewhat differently than the article did.) Recall that a positive attitude change means that a person has become more conservative in their opinions about immigration.
+
+
+
+3) What is the difference in att_chg between the Treated and Control?
+
+
+
+4) What is a 99% confidence intervals for that difference?
+
+
+
+5) How do you describe that confidence interval? How would a "frequentist" describe that interval?
+
+
+
+6) Are these results consistent or inconsistent with Enos (2014)?
+
+
+7) If all of the above is easy, try to replicate Figure 2 from the article, but using the overall measure of att_chg in place of the question-specific results shown there.
 
 
 

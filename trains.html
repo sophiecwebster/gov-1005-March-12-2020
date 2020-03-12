@@ -369,7 +369,9 @@ summary {
 </div>
 
 
-<pre class="r"><code># What is the 95th confidence interval for the mean income of the Treated? Using
+<div id="work-from-tuesday" class="section level1">
+<h1>Work from Tuesday</h1>
+<pre class="r"><code># What is the 95% confidence interval for the mean income of the Treated? Using
 # the bootstrap to calculate. If we did not use pull(), we would have needed to
 # use summarize() again, and, when we did, we might have needed ungroup().
 # Forgetting ungroup() is one of the biggest causes of bugs in this sort of
@@ -383,7 +385,14 @@ train %&gt;%
   pull(avg_inc) %&gt;%
   quantile(c(0.025, 0.975))</code></pre>
 <pre><code>##     2.5%    97.5% 
-## 115095.6 152403.2</code></pre>
+## 114305.1 153042.9</code></pre>
+<pre class="r"><code># Note the pattern above, and as discussed in class. First, we calculate
+# something, like mean income, just using standard R. Then, some where in the
+# middle of that pipe, we need to do the bootsrap, which almost always requires
+# rep_sample_n() followed by group_by(replicate). The exact order and structure
+# can vary. But this basic approach --- calculate something basic, then do
+# bootstrap/group_by in the &quot;middle&quot; of that calculation --- is one we will use
+# again and again.</code></pre>
 <pre class="r"><code># Mean income of the treated and the control, and then the difference between
 # the two. Main trick is the use of pivot_wider() to get these things on the
 # same row. That subtraction is easier.
@@ -393,11 +402,34 @@ train %&gt;%
   summarise(avg_inc = mean(income)) %&gt;% 
   pivot_wider(names_from = treatment, values_from = avg_inc) %&gt;% 
   mutate(Difference = Treated - Control) %&gt;% 
+  
+  # R has many tricks and, as we go forward, we will show some of them to you.
+  # We may not get around to explaining them all in class, but you should feel
+  # free to look up the help page and to ask at Study Hall. everything(), as a
+  # way of grabbing all the columns in a select() statement is an example of
+  # such a trick. I wanted Difference to be the first column when the results
+  # get printed out, followed by all the other columns in the tibble.
+  # everything() returns all columns in the tibble, except those already
+  # specified.
+  
   select(Difference, everything())</code></pre>
 <pre><code>## # A tibble: 1 x 3
 ##   Difference Treated Control
 ##        &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;
 ## 1    -16030. 132892. 148922.</code></pre>
+</div>
+<div id="tasks-for-today" class="section level1">
+<h1>Tasks for Today</h1>
+<ol style="list-style-type: decimal">
+<li><p>Now that we know the difference in mean income between treated and control in this sample, we want to get a confidence interval for that difference. If we had sampled commuters other than the ones that we did sample, the difference would be different. How different might it be? Are these results consistent with the claim, made in the article, that treatment was randomly assigned?</p></li>
+<li><p>The focus of the article is on the change in attitude. In our data, this is the variable att_chg. (Note that we have scaled this somewhat differently than the article did.) Recall that a positive attitude change means that a person has become more conservative in their opinions about immigration.</p></li>
+<li><p>What is the difference in att_chg between the Treated and Control?</p></li>
+<li><p>What is a 99% confidence intervals for that difference?</p></li>
+<li><p>How do you describe that confidence interval? How would a “frequentist” describe that interval?</p></li>
+<li><p>Are these results consistent or inconsistent with Enos (2014)?</p></li>
+<li><p>If all of the above is easy, try to replicate Figure 2 from the article, but using the overall measure of att_chg in place of the question-specific results shown there.</p></li>
+</ol>
+</div>
 
 
 
