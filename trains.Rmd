@@ -12,10 +12,14 @@ library(infer)
 library(tidyverse)
 ```
 
+# Work from Tuesday
+
 ```{r, ci_income}
 # What is the 95th confidence interval for the mean income of the Treated? Using
-# the bootstrap to calculate. If we did not sure pull(), we would have needed to
+# the bootstrap to calculate. If we did not use pull(), we would have needed to
 # use summarize() again, and, when we did, we might have needed ungroup().
+# Forgetting ungroup() is one of the biggest causes of bugs in this sort of
+# code.
 
 train %>% 
   filter(treatment == "Treated") %>% 
@@ -36,7 +40,29 @@ train %>%
   group_by(treatment) %>% 
   summarise(avg_inc = mean(income)) %>% 
   pivot_wider(names_from = treatment, values_from = avg_inc) %>% 
-  mutate(inc_diff = Treated - Control)
+  mutate(Difference = Treated - Control) %>% 
+  select(Difference, everything())
   
 ```
+
+# Tasks for Today
+
+Now that we know the difference between treated and control in this sample, we want to get a confidence interval for that difference. If we had sampled commuters other than the ones that we did sample, the difference would be different. How different might it be? Are these results consistent with the claim, made in the article, that treatment was randomly assigned?
+
+The focus of the article is on the change in attitude. In our data, this is the variable att_chg. (Note that we have scaled this somewhat differently than the article did.) Recall that a positive attitude change means that a person has become more conservative in their opinions about immigration.
+
+What is the difference in att_chg between the Treated and Control?
+
+What is a 99% confidence intervals for that difference?
+
+How do you describe that confidence interval?
+
+Are these results consistent or inconsistent with Enos (2014)?
+
+
+If all of the above is easy, try to replicate Figure 2 from the article, but using the overall measure of att_chg in place of the question-specific results shown there.
+
+
+
+
 
