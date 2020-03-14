@@ -65,18 +65,68 @@ train %>%
 
 1) Now that we know the difference in mean income between treated and control in this sample, we want to get a confidence interval for that difference. If we had sampled commuters other than the ones that we did sample, the difference would be different. How different might it be? Are these results consistent with the claim, made in the article, that treatment was randomly assigned?
 
+```{r}
+train %>% 
+  rep_sample_n(size = 115, replace = T, reps = 1000) %>%
+  group_by(treatment, replicate) %>% 
+  summarise(avg_inc = mean(income)) %>% 
+  pivot_wider(names_from = treatment, values_from = avg_inc) %>%
+  mutate(Difference = Treated - Control) %>% 
+  
+  # R has many tricks and, as we go forward, we will show some of them to you.
+  # We may not get around to explaining them all in class, but you should feel
+  # free to look up the help page and to ask at Study Hall. everything(), as a
+  # way of grabbing all the columns in a select() statement is an example of
+  # such a trick. I wanted Difference to be the first column when the results
+  # get printed out, followed by all the other columns in the tibble.
+  # everything() returns all columns in the tibble, except those already
+  # specified.
+  
+ # select(Difference, everything()) %>%
+  pull(Difference) %>%
+  quantile(c(0.025, 0.975))
+
+# likelihood that the true mean for the entire population is between these #s
+```
 
 
 
 2) The focus of the article is on the change in attitude. In our data, this is the variable att_chg. (Note that we have scaled this somewhat differently than the article did.) Recall that a positive attitude change means that a person has become more conservative in their opinions about immigration.
 
+```{r}
+train %>%
+  summarize(avg_att = mean(att_chg))
+```
+
+
 
 
 3) What is the difference in att_chg between the Treated and Control?
 
+```{r}
+train %>% 
+  group_by(treatment) %>% 
+  summarise(avg_attn = mean(att_chg)) %>% 
+  pivot_wider(names_from = treatment, values_from = avg_attn) %>%
+  mutate(Difference = Treated - Control)
+  
+  
+```
 
 
 4) What is a 99% confidence intervals for that difference?
+```{r}
+train %>% 
+  rep_sample_n(size = 115, replace = T, reps = 1000) %>%
+  group_by(treatment, replicate) %>% 
+  summarise(avg_att_chg = mean(att_chg)) %>% 
+  pivot_wider(names_from = treatment, values_from = avg_att_chg) %>%
+  mutate(Difference = Treated - Control) %>%
+  pull(Difference) %>%
+  quantile(c(0.005, 0.995))
+
+# we are 95% confident that true change in attitude would be ___.
+```
 
 
 
